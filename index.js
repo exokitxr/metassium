@@ -3,6 +3,7 @@ const http = require('http');
 const crypto = require('crypto');
 const child_process = require('child_process');
 const express = require('express');
+const dialog = require('dialog');
 
 const httpPort = 48080;
 const wsPort = 48081;
@@ -13,7 +14,7 @@ http.createServer(app)
   .listen(httpPort, async err => {
     if (!err) {
       let qrvrProcess, chromeProcess;
-      
+
       const u = process.argv.slice(2).find(arg => !/^--/.test(arg)) || `https://home.metachromium.com/`;
       const qrFlag = process.argv.slice(2).some(arg => arg === '--qr');
       const key = crypto.randomBytes(32).toString('hex');
@@ -62,7 +63,16 @@ http.createServer(app)
         );
         chromeProcess.on('exit', _exit);
       };
-      function _exit() {
+      function _exit(code) {
+        if (code === 100) {
+          dialog.err('OpenVR initialisation failed - is OpenVR installed?', 'Failed to start OpenVR', () => {
+            qrvrProcess && qrvrProcess.kill();
+            chromeProcess && chromeProcess.kill();
+            process.kill(process.pid);
+          });
+          return;
+        }
+
         qrvrProcess && qrvrProcess.kill();
         chromeProcess && chromeProcess.kill();
         process.kill(process.pid);

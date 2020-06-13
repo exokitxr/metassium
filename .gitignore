@@ -318,3 +318,5 @@ vs-chromium-project.txt
 
 # Ignore the default results output directory for tools/run-swarmed.py
 /results
+
+node_modules/

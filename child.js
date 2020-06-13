@@ -6,6 +6,10 @@ const port = parseInt(process.argv[2], 10);
 
 qrvr.start({
   port,
-}).then(() => {
-  console.log('qr reader started');
-});
+}).then(
+  () => console.log('qr reader started'),
+  err => {
+    console.log(err);
+    process.exit(err);
+  },
+);
